@@ -1,35 +1,27 @@
 package com.mynotes.api;
 
-import com.mynotes.exception.DuplicateRecordException;
 import com.mynotes.model.Note;
 import com.mynotes.repository.NotesRepository;
+import com.mynotes.repository.NotesRepositoryImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/notes")
 public class NotesController {
 
+
+
+    @Autowired
     private NotesRepository repo;
 
-    public NotesController(NotesRepository repo) {
-        this.repo = repo;
-    }
 
     @PostMapping
     @ResponseStatus(code = HttpStatus.CREATED)
     public Note createNote(@RequestBody Note note){
-        List<Note> notes = new ArrayList<>();
-        notes = getAllNotes();
-        for(Note n: notes){
-            if(n.getId() == note.getId()){
-                // throw exception DuplicateRecordException
-                throw new DuplicateRecordException("Note with this id already exist");
-            }
-        }
         return repo.saveNote(note);
     }
 
@@ -43,35 +35,16 @@ public class NotesController {
         return repo.getNoteById(id);
     }
 
+
     @DeleteMapping("/{id}")
     @ResponseStatus(code = HttpStatus.NO_CONTENT)
     public void deleteNote(@PathVariable("id") int id){
-        repo.deleteNode(id);
+         repo.getNoteById(id);
     }
-
-//    @GetMapping("/title/{title}")
-//    public List<Note> getNotesByTitle(@PathVariable("title") String title){
-//        return repo.getNotesByTitle(title);
-//    }
 
     @GetMapping("/search")
-    public List<Note> getNotesByTitle(@RequestParam("title") String title){
-        return repo.getNotesByTitle(title);
+    public List<Note> findNotesByTitle(@RequestParam("title") String title){
+        return repo.findNotesByTitle(title);
     }
 
-//    @GetMapping("/{title}")
-//    public void findNoteByTitle(@PathVariable("title") int title){
-//        return repo.ge(title);
-//    }
-
-//    @GetMapping("/hello")
-//    public String sayHello(){
-//        return "Hello from Spring Boot";
-//    }
-//
-//    @GetMapping("/note")
-//    public Note getNote(){
-//        Note note = new Note(23,"API","Learn Rest API");
-//        return note;
-//    }
 }

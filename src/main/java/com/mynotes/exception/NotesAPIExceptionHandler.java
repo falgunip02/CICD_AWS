@@ -1,6 +1,8 @@
 package com.mynotes.exception;
 
 import com.mynotes.dto.ErrorResponseDto;
+
+import com.mynotes.model.Note;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -12,22 +14,7 @@ import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 
 @RestControllerAdvice
-public class NotesAPIExceptionHandler {
-
-//    @ExceptionHandler(NoSuchElementException.class)
-//    @ResponseStatus(code = HttpStatus.NOT_FOUND)
-//    public String handleNotFoundError(NoSuchElementException ex){
-//        return "Record NOt Found";
-//    }
-
-//    @ExceptionHandler(NoSuchElementException.class)
-//    @ResponseStatus(code = HttpStatus.NOT_FOUND)
-//    public ProblemDetail handleNotFoundError(NoSuchElementException ex){
-//        ProblemDetail problemDetail = ProblemDetail.forStatus(HttpStatus.NOT_FOUND);
-//        problemDetail.setDetail(ex.getMessage());
-//        problemDetail.setTitle("Not Found");
-//        return problemDetail;
-//    }
+public class NotesApiExceptionHandler {
 
     @ResponseStatus(code = HttpStatus.NOT_FOUND)
     @ExceptionHandler({NoSuchElementException.class, RecordNotFoundException.class})
@@ -44,7 +31,7 @@ public class NotesAPIExceptionHandler {
 
     @ResponseStatus(code = HttpStatus.BAD_REQUEST)
     @ExceptionHandler({DuplicateRecordException.class})
-    public ErrorResponseDto handleDuplicateRecordException(Exception ex, HttpServletRequest request){
+    public ErrorResponseDto handleDuplicateRecordError(Exception ex, HttpServletRequest request){
         ErrorResponseDto errorBody = new ErrorResponseDto(
                 ex.getMessage(),
                 400,
@@ -54,4 +41,7 @@ public class NotesAPIExceptionHandler {
         );
         return errorBody;
     }
+
+
+
 }

@@ -1,14 +1,18 @@
 package com.mynotes.repository;
 
+import com.mynotes.exception.DuplicateRecordException;
+import com.mynotes.exception.RecordNotFoundException;
 import com.mynotes.model.Note;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 @Component
-public class NotesRepositoryImpl implements NotesRepository {
+public class NotesRepositoryImpl implements NotesRepository{
+
     List<Note> notes = new ArrayList<>();
 
     @PostConstruct
@@ -21,30 +25,33 @@ public class NotesRepositoryImpl implements NotesRepository {
         notes.add(note3);
     }
 
-    @Override
     public Note saveNote(Note note) {
+        Note exists = notes.stream().filter(n->n.getId()==note.getId()).findFirst().orElse(null);
+        if(exists != null){
+            throw new DuplicateRecordException("Node with id "+note.getId()+" Already Present");
+        }
         notes.add(note);
         return note;
     }
 
-    @Override
     public Note getNoteById(int id) {
-        return notes.stream().filter(i -> i.getId() == id).findFirst().get();
+        return notes.stream().filter(n->n.getId()==id)
+                .findFirst()
+                .orElseThrow(()->new RecordNotFoundException("Note with id "+id+" Not Found"));
     }
 
-    @Override
     public List<Note> getAllNotes() {
         return notes;
     }
 
-    @Override
     public void deleteNode(int id) {
-        notes.removeIf(i -> i.getId() == id);
+        notes.removeIf(n->n.getId()==id);
     }
 
-    @Override
-    public List<Note> getNotesByTitle(String title){
-        List<Note> existingNotes = notes.stream().filter(n-> n.getTitle().toLowerCase().contains(title.toLowerCase())).toList();
-        return existingNotes;
+    public List<Note> findNotesByTitle(String title) {
+
+        return notes.stream().filter(n->n.getTitle().toLowerCase().contains(title.toLowerCase()))
+                .toList();
+
     }
 }
